@@ -1,5 +1,5 @@
 # makfile configuration
-COMMON_OBJECTS		= ui.o draw_shapes.o wdtInterruptHandler.o
+COMMON_OBJECTS		= ui.o wdtInterruptHandler.o
 CPU             	= msp430g2553
 CFLAGS          	= -mmcu=${CPU} -Os -I../h
 LDFLAGS		= -L../lib -L/opt/ti/msp430_gcc/include/ 
@@ -22,4 +22,4 @@ clean:
 
 ui.o: ui.c ui.h
 
-lcddraw.o: lcddraw.c
+
