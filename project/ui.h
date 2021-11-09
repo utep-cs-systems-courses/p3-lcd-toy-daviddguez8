@@ -11,7 +11,10 @@ typedef struct player_st {
   u_char height;
   u_char width;
   u_int color;
+  u_int move_button; //can be either 0 or 1, 0 for the left, 1 for right.
 } Player;
+
+extern Player p1, p2;
 
 //TODO: add actual things to this
 typedef struct bullet_st {
@@ -34,12 +37,13 @@ typedef struct light_st {
   u_char radius;
 } Light;
 
-//initializes a new match, with the initial ui
-void init_ui(void);
+extern Light light;
 
-//clears the previous position and updates to new one
-//params: 1 for player 1, 2 for player 2
-void update_player(int);
+//initializes a new match, with the initial ui
+void init_match_ui(void);
+
+//clears the previous position and updates to new one by y_step pixels on y-axis
+void update_player(int player, int y_step);
 
 //change the color of the light (red or green)
 void flip_light(void);

@@ -4,6 +4,7 @@
 #include "lcddraw.h"
 #include "draw_shapes.h"
 #include "ui.h"
+#include "switches.h"
 
 // WARNING: LCD DISPLAY USES P1.0.  Do not touch!!! 
 
@@ -12,8 +13,8 @@ void main()
   configureClocks();
   lcd_init();
   clearScreen(background_color);
-
-  init_ui();
+  switch_init();
+  init_match_ui();
 
   enableWDTInterrupts();
 

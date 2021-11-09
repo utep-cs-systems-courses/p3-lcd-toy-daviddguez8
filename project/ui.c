@@ -13,12 +13,12 @@ Light light;
 
 u_int background_color = COLOR_BLACK;
 
-void init_ui(void) {
+void init_match_ui(void) {  
 
   //have a light circle centered at the top
   light.top_left_x = 54;
   light.top_left_y = 5;
-  light.color = COLOR_RED;
+  light.color = COLOR_GREEN;
   light.height = 22;
   light.width = 22; 
   light.center_x = 128/2 + 1;
@@ -40,8 +40,8 @@ void init_ui(void) {
   p1.top_left_x = p1.center_x - (p1.width/2);
   p1.top_left_y = START_ROW;
   p1.color = COLOR_RED;
+  p1.move_button = 0; //start with left button
 
-  //fillRectangle(p1.top_left_col, p1.top_left_row, p1.width, p1.height, p1.color); 
   draw_player(&p1);
   
   //initialize and draw p2
@@ -53,8 +53,8 @@ void init_ui(void) {
   p2.top_left_x = p2.center_x - (p2.width/2 + 1);
   p2.top_left_y = START_ROW;
   p2.color = COLOR_BLUE;
+  p2.move_button = 0; //start moving with left
 
-  //fillRectangle(p2.top_left_col, p2.top_left_row, p2.width, p2.height, p2.color); 
   draw_player(&p2);
 }
 
@@ -66,7 +66,7 @@ void draw_player(Player *player) {
 		player->height,
 		player->color
 		); 
-
+  
   //TODO: implement player graphics
   int head_radius = 3;
   int head_center_x = player->center_x;
@@ -86,8 +86,30 @@ void draw_player(Player *player) {
   //for the legs I will draw two triangles
   //one on top of the first with a down offset of 2 pixels
   //this will basically draw two diagonal lines
-  draw_triangle(4, 4, end_body_y, player->center_x, COLOR_WHITE);
-  //draw_triangle(4, 4, end_body_y+2, player->center_x, player->color);
+  draw_triangle(4, 4, end_body_y-1, player->center_x, COLOR_WHITE);
+  draw_triangle(4, 4, end_body_y+1, player->center_x, player->color);
+}
+
+void update_player(int player, int y_step){
+  Player *to_update = (player == 1) ? &p1 : &p2; 
+  //clear player 1
+  fillRectangle(
+		to_update->top_left_x,
+		to_update->top_left_y,
+		to_update->width,
+		to_update->height,
+		background_color
+		); //clears the previous position of p1
+ 
+  //update positions by y_step
+  to_update->center_y -= y_step;
+  to_update->top_left_y -= y_step; 
+  to_update->center_y -= y_step;
+  to_update->top_left_y -= y_step; 
+  to_update->move_button = 1 - to_update->move_button; //flip the next correct move_button
+  
+  //redraw player with new positions
+  draw_player(to_update);  
 }
 
 //draws a vertical line starting from y_start to y_end
@@ -160,24 +182,30 @@ draw_circle(int x, int y, int r, u_int color)
   }
 }
 
+//draws a triangle with given height. Works for drawing the legs...
 void
 draw_triangle(u_int height, u_int width, u_int top_y, u_int center_x, u_int color)
 {
-  u_int row = top_y, col = center_x;
+  //we want to calculate the slope
+  //for that we want to get the bottom corner
+  u_int left_bottom_x = center_x - (width/2);
+  u_int left_bottom_y = top_y + height;
 
-  u_int step = 0;
-  //unsigned int color = (blue << 11) | (green << 5) | red;
+  //to calculate the slope we can use the slope formula
+  //m = (y2-y1)/(x2-x1)
+  u_int rise = height;
+  u_int run = width/2;
 
-  // draw a n equilateral triangle
-  // starts at the top and works down
-  // at the first row the width is 1, second 2 and so on
-  for (step = 0; step < height; step++) {
-    // left side of triangle
-    u_int start_col = col - (step / 2);
-    // right side of triangle
-    u_int end_col   = col + (step / 2);
-    u_int width     = end_col - start_col;
-    fillRectangle(col - (step / 2), row+step, width, 1, color);
+  //this means that each time the slope should grow in the y-axis by rise pixels, and x-axis by run pixels
+  //we are interested in how much the x should change for 1 growth in pixel on the y-axis
+  u_int x_step = 1;
+
+  u_int count = 0;
+
+  while(count <= height) {
+    u_int curr_step = x_step*count;
+    draw_horizontal_line(center_x-(curr_step), center_x+(curr_step), top_y+count, color); 
+    ++count;
   }
 }
 

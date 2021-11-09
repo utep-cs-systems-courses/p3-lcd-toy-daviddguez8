@@ -9,14 +9,20 @@
 void
 __interrupt_vec(WDT_VECTOR) WDT()
 {
-  const  u_int second_limit = 500;
+  run_game();
+  /*
+  const  u_int second_limit = 250;
   static u_int second_count = 0;
+
+  const u_int tenth_limit = 5;
 
   second_count++;
 
   if (second_count >= second_limit) {
-    flip_light();
+    //flip_light();
+    //update_player(1, 1);
+    //update_player(2, 2);
     second_count = 0;
-  }
+    } */
 } 
 
