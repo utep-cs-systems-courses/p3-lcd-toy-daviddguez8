@@ -1,28 +1,40 @@
 #include <msp430.h>
 #include "libTimer.h"
-//#include "draw_shapes.h"
-#include "ui.h"
+#include "led.h"
+#include "game_state_machine.h"
 
 // function that handles interrupts
 // from the periodic timer
 // The timer fires an event 250 times/sec
 void
-__interrupt_vec(WDT_VECTOR) WDT()
+wdtInterruptHandler()
 {
-  run_game();
-  /*
-  const  u_int second_limit = 250;
-  static u_int second_count = 0;
-
-  const u_int tenth_limit = 5;
-
-  second_count++;
-
-  if (second_count >= second_limit) {
-    //flip_light();
-    //update_player(1, 1);
-    //update_player(2, 2);
-    second_count = 0;
-    } */
+  const u_int state1_limit = 250;
+  const u_int state2_limit = 15;
+  const u_int state3_limit = 15;
+  static u_int main_count = 0;
+  
+  switch(state) {
+  case 1:
+    if(main_count >= state1_limit) {
+      work_to_be_done = 1;
+      main_count = 0;
+    }
+    break;
+  case 2: //player shot
+    if(main_count >= state2_limit) {
+      work_to_be_done = 1;
+      main_count = 0;
+    }
+    break;
+  case 3:
+    if(main_count >= state3_limit) {
+      work_to_be_done = 1;
+      main_count = 0;
+    }
+    break;
+  }
+  
+  main_count++;
 } 
 

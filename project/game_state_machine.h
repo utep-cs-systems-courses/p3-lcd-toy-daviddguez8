@@ -3,6 +3,11 @@
 
 #include <lcdutils.h>
 
+extern u_int work_to_be_done;
+extern u_int state;
+
+int winner_song(int);
+
 void run_game(void);
 
 void button_press(int);

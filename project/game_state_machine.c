@@ -3,12 +3,16 @@
 #include "libTimer.h"
 #include "ui.h"
 #include "switches.h"
+#include "buzzer.h"
 
-#define STEP 3
+#define STEP 5
+ 
+extern u_int work_to_be_done = 0; //flag to indicates CPU need to come back on
 
-static u_int state = 1; //start in main menu (0), for testing using 1 (game) 
+extern u_int state = 1; //start in main menu (0), for testing using 1 (game) 
 static u_int initialize = 1; //flag to indicate the state was just switched, thus initialize it.
 static u_int to_shoot = 0;
+static u_int winner = 0;
 
 //called 250/second, handles state control and run of the game
 void run_game(void) {
@@ -26,17 +30,60 @@ void run_game(void) {
     //state = 3;
     break;
   case 2://player killed
-    //shoot_player();
-    //if bullet hits:
-    //  reset_player();
-    //  state = 1;
-    //  initialize = 0; no need to initialize 
+    if(to_shoot == 0) {
+      //error happened?
+      state = 0;
+      initialize = 0; //start over
+      break;
+    }
+
+    int bullet_hit = update_bullet_towards_player(to_shoot);
+    if(bullet_hit){ 
+      reset_player(to_shoot);//reset position
+      state = 1;//change state
+      initialize = 0;//don't reinitialize the screen
+      to_shoot = 0;//reset the person to shoot
+    }
     break;
-  case 3://player won
-    //update_score();
+  case 3: ;//player scored
+    //will reproduce a song, returns 1 when done so we can reset player
+    int done = winner_song(winner);
+    if(done == 1) {
+      reset_player(1);
+      reset_player(2);
+      update_score(winner);
+      state = 1;
+      initialize = 0;
+      to_shoot = 0;
+      winner = 0;
+      buzzer_set_period(0);
+    }
     break;
   }    
-}  
+}
+
+//called about 4 times per second, reproduce a different note every time
+int winner_song(int winner) {
+  static u_int index = 0;
+  const int notes[4] = {5000, 4000, 4000, 2000};
+  static u_int count = 0;
+  const int periods[4] = {2, 1, 1, 2};
+
+  buzzer_set_period(notes[index]);
+
+  if(count >= periods[index]) {
+    count = 0;
+    index++;
+  }
+
+  if(index >= 4){
+    index = 0;
+    count = 0;
+    return 1;
+  }
+  count++;
+  return 0;
+}
 
 void button_press(int pressed_button) {
   switch(state) {
@@ -74,7 +121,12 @@ void check_player_move(int pressed_button) {
   
   //correct button was pressed, move step pixels up
   if (pressed_button & expected_button) {
-    update_player(player, STEP);
+    if(update_player(player, STEP) == 1) {
+      //player won, change state
+      state = 3;
+      winner = player;
+      return;
+    }
   }
   //wrong button, move step pixels down
   else {
@@ -94,27 +146,22 @@ int check_red_move(int pressed_button) {
   return 0; //default
 }
 
+//called every second, flips the color of the light by different time frames
 void light_timer(void) {
-  const int times[12] = {4, 3, 5, 2, 2, 2, 4, 1, 3, 1, 4, 1};
+  const int times[12] = {4, 3, 5, 3, 1, 2, 4, 1, 3, 4, 1, 1};
   static int times_idx = 0;
-  const  u_int second_limit = 250;
+  //const  u_int second_limit = 250;
   static u_int main_count = 0;
-  static u_int second_count = 0;
-  static u_int curr_limit = 3;
-
+  //static u_int second_count = 0;
+  static u_int curr_limit = 30; //TODO: change after testing
+ 
   ++main_count;
 
-  if (main_count >= second_limit) {
-    //flip_light();
-    main_count = 0;
-    second_count++; //indicates a second passed
-  }
-
-  if (second_count >= curr_limit) {
+  if (main_count >= curr_limit) {
     flip_light();
     if (light.color == COLOR_GREEN) {
       //it flipped to a green color
-      curr_limit = times[times_idx]; //max time to transition will be 6 seconds
+      curr_limit = times[times_idx]; 
       times_idx++;
       if(times_idx >= 12) {
 	times_idx = 0;
@@ -123,6 +170,13 @@ void light_timer(void) {
     else {
       curr_limit = 2; //red light to always last 2 seconds
     }
-    second_count = 0;
+    main_count = 0;
   }
+}
+
+//called 250/second
+//shoots "to_shoot" player
+//returns 1 if bullet hits
+int shoot_player(int to_shoot) {
+  return 1;
 }
