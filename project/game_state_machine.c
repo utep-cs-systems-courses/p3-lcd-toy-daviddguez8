@@ -36,18 +36,19 @@ void run_game(void) {
       initialize = 0; //start over
       break;
     }
-
+    looser_song();
     int bullet_hit = update_bullet_towards_player(to_shoot);
     if(bullet_hit){ 
       reset_player(to_shoot);//reset position
       state = 1;//change state
       initialize = 0;//don't reinitialize the screen
       to_shoot = 0;//reset the person to shoot
+      buzzer_set_period(0);//turn off the song
     }
     break;
   case 3: ;//player scored
     //will reproduce a song, returns 1 when done so we can reset player
-    int done = winner_song(winner);
+    int done = winner_song();
     if(done == 1) {
       reset_player(1);
       reset_player(2);
@@ -63,11 +64,12 @@ void run_game(void) {
 }
 
 //called about 4 times per second, reproduce a different note every time
-int winner_song(int winner) {
+//returns 0 until song is done.
+int winner_song() {
   static u_int index = 0;
-  const int notes[4] = {5000, 4000, 4000, 2000};
+  const int notes[4] = {3000, 4000, 4050, 2000};
   static u_int count = 0;
-  const int periods[4] = {2, 1, 1, 2};
+  const int periods[4] = {3, 1, 1, 4};
 
   buzzer_set_period(notes[index]);
 
@@ -85,6 +87,19 @@ int winner_song(int winner) {
   return 0;
 }
 
+//called once every 10th of a second, reproduces a song
+void looser_song() {
+  static u_int index = 0;
+  const int notes[5] = {1100, 2000, 3100, 5100, 8100};
+  
+  buzzer_set_period(notes[index]);
+  index++;
+  if(index>=5) {
+    index = 0;
+  }
+ 
+}
+
 void button_press(int pressed_button) {
   switch(state) {
   case 0:
@@ -99,6 +114,7 @@ void button_press(int pressed_button) {
       state = 2; //shoot a player
       to_shoot = check_red_move(pressed_button);
     }
+    break;
   case 2: //shooting a player, do nothing
   case 3: //player winner, do nothing
     break;
@@ -148,13 +164,14 @@ int check_red_move(int pressed_button) {
 
 //called every second, flips the color of the light by different time frames
 void light_timer(void) {
-  const int times[12] = {4, 3, 5, 3, 1, 2, 4, 1, 3, 4, 1, 1};
+  const int times[12] = {4, 3, 5, 3, 1, 2, 4, 2, 3, 4, 1, 1};
   static int times_idx = 0;
   //const  u_int second_limit = 250;
   static u_int main_count = 0;
   //static u_int second_count = 0;
-  static u_int curr_limit = 30; //TODO: change after testing
- 
+  static u_int curr_limit = 3;
+
+  
   ++main_count;
 
   if (main_count >= curr_limit) {
@@ -174,9 +191,3 @@ void light_timer(void) {
   }
 }
 
-//called 250/second
-//shoots "to_shoot" player
-//returns 1 if bullet hits
-int shoot_player(int to_shoot) {
-  return 1;
-}
