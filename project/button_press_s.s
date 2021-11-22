@@ -1,6 +1,7 @@
 	.text
 	.balign 2
 
+	.global button_press
 	.word button_press
 	.text
 
@@ -19,16 +20,16 @@ jt:
 	.word #default
 	.word #default
 	
-	; state in r12
+	; pressed_button in r12
 button_press:
 	;; range check, state>=4
-	cmp #4, r12
+	cmp #4, &state
 	jnc end_switch
 
-	mov r12, r15 		; to save the value of pressed_button
+	mov &state, r15 		; to save the value of pressed_button
 	mov jt, r13
-	add r12, r12 		; handles 2 byte words
-	add r12, r13
+	add r15, r15 		; handles 2 byte words
+	add r15, r13
 	mov (0)r13, pc
 
 case_1:
@@ -37,13 +38,13 @@ case_1:
 	cmp &COLOR_GREEN, (8)r14 ; should be light.color
 	jnz else
 
-	mov r15, r12 		; setup parameter
+ 	; parameter is already set
 	call #check_player_move
 	jmp end_switch
 
 else:
 	mov #2, &state 		; state = 2
-	mov r15, r12
+	;; parameter already set
 	call #check_red_move	
 	mov r12, &to_shoot 	; to_shoot = check_red_move(pressed_button)
 	jmp end_switch

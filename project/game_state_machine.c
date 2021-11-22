@@ -11,7 +11,7 @@ extern u_int work_to_be_done = 0; //flag to indicates CPU need to come back on
 
 extern u_int state = 1; //start in main menu (0), for testing using 1 (game) 
 static u_int initialize = 1; //flag to indicate the state was just switched, thus initialize it.
-static u_int to_shoot = 0;
+extern u_int to_shoot = 0;
 static u_int winner = 0;
 
 //called 250/second, handles state control and run of the game
@@ -99,7 +99,7 @@ void looser_song() {
   }
  
 }
-
+/*
 void button_press(int pressed_button) {
   switch(state) {
   case 0:
@@ -119,7 +119,7 @@ void button_press(int pressed_button) {
   case 3: //player winner, do nothing
     break;
   }
-}
+  }*/
 
 void check_player_move(int pressed_button) {
   int expected_button;
