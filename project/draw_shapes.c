@@ -132,7 +132,7 @@ draw_triangle(void)
     u_char width     = end_col - start_col;
     fillRectangle(col - (step / 2), row+step, width, 1, color);
   }
-}
+} 
 
 void
 drawHorizontalLine(u_int x_start, u_int x_end, u_int y, u_int colorBGR)
@@ -158,7 +158,7 @@ drawLines(u_int x_coord, u_int y_coord, u_int x_point, u_int y_point, u_int colo
   drawHorizontalLine(x_coord - y_point, x_coord + y_point, y_coord + x_point, color);
   drawHorizontalLine(x_coord - y_point, x_coord + y_point, y_coord - x_point, color);
 					  
-}
+} 
 
 void
 draw_circle(int x, int y, int r, u_int color)
@@ -186,7 +186,7 @@ draw_circle(int x, int y, int r, u_int color)
     }
     drawLines(x_coord, y_coord, x_point, y_point, color);
   }
-}
+} 
 
 void
 moving_circle(void)
