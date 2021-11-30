@@ -55,6 +55,9 @@ void draw_bushes(void);
 //clears the previous position and updates to new one by y_step pixels on y-axis
 int update_player(int player, int y_step);
 
+//resets specified player to initial position
+void reset_player(int player);
+
 //change the color of the light (red or green)
 void flip_light(void);
 

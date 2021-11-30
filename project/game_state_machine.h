@@ -6,7 +6,10 @@
 extern u_int work_to_be_done;
 extern u_int state;
 extern u_int to_shoot;
-int winner_song(int);
+
+int winner_song(void);
+
+void looser_song(void);
 
 void run_game(void);
 

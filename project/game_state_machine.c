@@ -4,14 +4,15 @@
 #include "ui.h"
 #include "switches.h"
 #include "buzzer.h"
+#include "game_state_machine.h"
 
 #define STEP 5
  
-extern u_int work_to_be_done = 0; //flag to indicates CPU need to come back on
+u_int work_to_be_done = 0; //flag to indicates CPU need to come back on
 
-extern u_int state = 1; //start in main menu (0), for testing using 1 (game) 
+u_int state = 1; //start in main menu (0), for testing using 1 (game) 
 static u_int initialize = 1; //flag to indicate the state was just switched, thus initialize it.
-extern u_int to_shoot = 0;
+u_int to_shoot = 0;
 static u_int winner = 0;
 
 //called 250/second, handles state control and run of the game
@@ -65,7 +66,7 @@ void run_game(void) {
 
 //called about 4 times per second, reproduce a different note every time
 //returns 0 until song is done.
-int winner_song() {
+int winner_song(void) {
   static u_int index = 0;
   const int notes[4] = {3000, 4000, 4050, 2000};
   static u_int count = 0;

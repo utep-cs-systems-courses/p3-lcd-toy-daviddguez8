@@ -7,6 +7,7 @@
 #include "game_state_machine.h"
 #include "switches.h"
 #include "led.h"
+#include "buzzer.h"
 
 // WARNING: LCD DISPLAY USES P1.0.  Do not touch!!! 
 
